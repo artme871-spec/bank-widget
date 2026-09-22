@@ -1,0 +1,7 @@
+[flake8]
+feature/homework_10_1
+max-line-length = 119
+exclude = .venv
+max-line-length = 129
+exclude = .venv, 
+main
