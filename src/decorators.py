@@ -1,17 +1,23 @@
 import functools
 import sys
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, TextIO, TypeVar, cast
+
+# Создаем переменную типа для сохранения сигнатуры оборачиваемых функций
+F = TypeVar("F", bound=Callable[..., Any])
 
 
-def log(filename: Optional[str] = None) -> Callable:
+def log(filename: Optional[str] = None) -> Callable[[F], F]:
     """Декоратор, который логирует начало, конец, результат или ошибку выполнения функции.
 
     Логи выводятся в файл (если задан filename) или в консоль (sys.stdout).
     """
-    def decorator(func: Callable) -> Callable:
+
+    def decorator(func: F) -> F:
         @functools.wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> Any:
-            # Определяем, куда писать логи
+            # Явно указываем mypy, что это объект для записи текста (TextIO)
+            target_output: TextIO
+
             if filename:
                 target_output = open(filename, "a", encoding="utf-8")
             else:
@@ -33,5 +39,6 @@ def log(filename: Optional[str] = None) -> Callable:
                 if filename:
                     target_output.close()
 
-        return wrapper
+        return cast(F, wrapper)
+
     return decorator
